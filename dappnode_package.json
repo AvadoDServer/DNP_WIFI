@@ -1,18 +1,20 @@
 {
   "name": "wifi.dnp.dappnode.eth",
-  "version": "0.2.0",
-  "description": "A WIFI hotspot for DAppNode",
+  "version": "0.3.1",
+  "description": "A WIFI hotspot for AVADO",
   "avatar": "",
   "type": "dncore",
   "image": {
-    "path": "",
-    "hash": "",
-    "size": "",
+    "path": "wifi.dnp.dappnode.eth_0.3.1.tar.xz",
+    "hash": "/ipfs/QmU6d3DfNHsrbyAmpqTp8FpHwubEYiJbCED8C1wBbD7sqc",
+    "size": 52662202,
     "restart": "always",
     "privileged": "true",
     "subnet": "172.33.0.0/16",
     "ipv4_address": "172.33.1.10",
-    "volumes": ["/var/run/docker.sock:/var/run/docker.sock"],
+    "volumes": [
+      "/var/run/docker.sock:/var/run/docker.sock"
+    ],
     "environment": [
       "SSID=AVADO",
       "WPA_PASSPHRASE=avado123",
@@ -27,7 +29,11 @@
     "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
     "Abel Vdo <vdo@greyfaze.net> (https://github.com/vdo)"
   ],
-  "keywords": ["DAppNodeCore", "WIFI", "Hotspot"],
+  "keywords": [
+    "DAppNodeCore",
+    "WIFI",
+    "Hotspot"
+  ],
   "links": {
     "homepage": "https://github.com/dappnode/DNP_WIFI#readme"
   },

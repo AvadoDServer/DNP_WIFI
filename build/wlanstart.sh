@@ -118,7 +118,8 @@ elif [ $NAT = 'true' ]; then
 fi
 
 echo "Configuring DHCP server .."
-cat > "/etc/dhcpd.conf" <<EOF
+mkdir -p /etc/dhcp
+cat > "/etc/dhcp/dhcpd.conf" <<EOF
 option domain-name-servers ${DNS};
 option subnet-mask 255.255.255.0;
 option routers ${AP_ADDR};
@@ -126,6 +127,12 @@ subnet ${SUBNET} netmask 255.255.255.0 {
   range ${SUBNET::-1}100 ${SUBNET::-1}253;
 }
 EOF
+echo "1"
+ls /etc/dhcp
+echo "2"
+cat /etc/dhcp/dhcpd.conf
+echo "3"
+
 
 echo "Starting DHCP server .."
 dhcpd ${INTERFACE}

@@ -1,6 +1,6 @@
 {
   "name": "wifi.dnp.dappnode.eth",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A WIFI hotspot for AVADO",
   "avatar": "",
   "type": "dncore",

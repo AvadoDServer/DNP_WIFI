@@ -1,11 +1,11 @@
 {
   "name": "wifi.dnp.dappnode.eth",
-  "version": "0.10.1",
+  "version": "10.0.1",
   "description": "A WIFI hotspot for AVADO",
   "avatar": "",
   "type": "dncore",
   "image": {
-    "path": "wifi.dnp.dappnode.eth_0.10.1.tar.xz",
+    "path": "wifi.dnp.dappnode.eth_10.0.1.tar.xz",
     "hash": "/ipfs/QmPSjjXexah8an6f2x83PJxLRNSGSgbtLm3h4Y9CzWeCTX",
     "size": 52795640,
     "restart": "always",

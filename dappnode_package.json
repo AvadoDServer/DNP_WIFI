@@ -1,13 +1,13 @@
 {
   "name": "wifi.dnp.dappnode.eth",
-  "version": "0.3.2",
+  "version": "0.10.1",
   "description": "A WIFI hotspot for AVADO",
   "avatar": "",
   "type": "dncore",
   "image": {
-    "path": "wifi.dnp.dappnode.eth_0.3.1.tar.xz",
-    "hash": "/ipfs/QmU6d3DfNHsrbyAmpqTp8FpHwubEYiJbCED8C1wBbD7sqc",
-    "size": 52662202,
+    "path": "wifi.dnp.dappnode.eth_0.10.1.tar.xz",
+    "hash": "/ipfs/QmPSjjXexah8an6f2x83PJxLRNSGSgbtLm3h4Y9CzWeCTX",
+    "size": 52795640,
     "restart": "always",
     "privileged": "true",
     "subnet": "172.33.0.0/16",
@@ -34,15 +34,5 @@
     "WIFI",
     "Hotspot"
   ],
-  "links": {
-    "homepage": "https://github.com/dappnode/DNP_WIFI#readme"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/dappnode/DNP_WIFI"
-  },
-  "bugs": {
-    "url": "https://github.com/dappnode/DNP_WIFI/issues"
-  },
   "license": "GPL-3.0"
 }

@@ -6,7 +6,7 @@
   "type": "dncore",
   "image": {
     "path": "wifi.dnp.dappnode.eth_10.0.1.tar.xz",
-    "hash": "/ipfs/QmPSjjXexah8an6f2x83PJxLRNSGSgbtLm3h4Y9CzWeCTX",
+    "hash": "/ipfs/QmVRE6JW6ENYQThh5Zw9zs3qAzZLjKsERXRakpiWameGNe",
     "size": 52795640,
     "restart": "always",
     "privileged": "true",

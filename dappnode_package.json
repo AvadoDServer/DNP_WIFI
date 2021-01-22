@@ -1,15 +1,16 @@
 {
   "name": "wifi.dnp.dappnode.eth",
   "version": "10.0.1",
+  "title": "WiFi",
   "description": "A WIFI hotspot for AVADO",
-  "avatar": "",
+  "avatar": "/ipfs/QmZnRtwgeCYfBHzYpCtfURJUb6eP7UyD4ng5MGUA7P8cMm",
   "type": "dncore",
   "image": {
     "path": "wifi.dnp.dappnode.eth_10.0.1.tar.xz",
-    "hash": "/ipfs/QmVRE6JW6ENYQThh5Zw9zs3qAzZLjKsERXRakpiWameGNe",
-    "size": 52795640,
+    "hash": "/ipfs/QmYwYExe5d6swFt9dbgv5mLpGXBicjqbNxZS8HguNWiNGf",
+    "size": 57614108,
     "restart": "always",
-    "privileged": "true",
+    "privileged": true,
     "subnet": "172.33.0.0/16",
     "ipv4_address": "172.33.1.10",
     "volumes": [
@@ -25,14 +26,5 @@
     ]
   },
   "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
-  "contributors": [
-    "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
-    "Abel Vdo <vdo@greyfaze.net> (https://github.com/vdo)"
-  ],
-  "keywords": [
-    "DAppNodeCore",
-    "WIFI",
-    "Hotspot"
-  ],
   "license": "GPL-3.0"
 }

@@ -1,10 +1,7 @@
-version: '3.4'
+version: '3.5'
 networks:
-  network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.33.0.0/16
+  avado:
+    external: true  
 services:
   wifi.dnp.dappnode.eth:
     image: 'wifi.dnp.dappnode.eth:10.0.1'
@@ -14,12 +11,12 @@ services:
       - wifi.dnp.dappnode.eth.env
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
-    dns: 172.33.1.2
+    dns: 172.30.0.2
     privileged: true
     restart: always
     networks:
-      network:
-        ipv4_address: 172.33.1.10
+      avado:
+        ipv4_address: 172.30.0.10
     logging:
       options:
         max-size: 10m

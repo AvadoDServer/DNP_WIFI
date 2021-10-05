@@ -7,8 +7,8 @@ if [ ! -w "/sys" ] ; then
 fi
 
 # Default values
-true ${SUBNET:=172.30.0.0}
-true ${AP_ADDR:=172.30.0.254}
+true ${SUBNET:=172.30.4.0}
+true ${AP_ADDR:=172.30.4.254}
 true ${DNS:=172.30.0.2}
 true ${NAT:=true}
 true ${INTERFACE:=}
@@ -22,8 +22,8 @@ true ${MODE:=admin}
 # Attach interface to container in guest mode
 # This will force NAT to be disabled!
 if [ "$MODE" == "guest"  ]; then
-  SUBNET=172.30.0.0
-  AP_ADDR=172.30.0.254
+  SUBNET=172.30.4.0
+  AP_ADDR=172.30.4.254
   NAT=false
 fi
 

@@ -1,10 +1,10 @@
 version: '3.5'
 networks:
   avado:
-    external: true  
+    external: true
 services:
   wifi.dnp.dappnode.eth:
-    image: 'wifi.dnp.dappnode.eth:10.0.1'
+    image: 'wifi.dnp.dappnode.eth:10.0.2'
     container_name: DAppNodeCore-wifi.dnp.dappnode.eth
     build: ./build
     env_file:

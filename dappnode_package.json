@@ -1,14 +1,14 @@
 {
   "name": "wifi.dnp.dappnode.eth",
   "version": "10.0.1",
-  "title": "WiFi",
+  "title": "WiFi Server",
   "description": "A WIFI hotspot for AVADO",
-  "avatar": "/ipfs/QmZnRtwgeCYfBHzYpCtfURJUb6eP7UyD4ng5MGUA7P8cMm",
+  "avatar": "/ipfs/Qma99egVdY8uHfiH7A9mSbBMHhVQijmrM8oH67KVCxxDke",
   "type": "dncore",
   "image": {
     "path": "wifi.dnp.dappnode.eth_10.0.1.tar.xz",
-    "hash": "/ipfs/QmSTTjHQJfZh3T7vqeXW4MYqRAubTgyJ3jhaTujoGSCMhw",
-    "size": 49444376,
+    "hash": "/ipfs/QmZKXXP5FqjbucoGgubw4mCvhKcU8m7N3ErCY74ypcZaFp",
+    "size": 46623936,
     "restart": "always",
     "privileged": true,
     "subnet": "172.33.0.0/16",
@@ -27,5 +27,5 @@
   },
   "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
   "license": "GPL-3.0",
-  "builddate": "2021-10-21T20:02:00.696Z"
+  "builddate": "2021-12-19T15:58:25.570Z"
 }

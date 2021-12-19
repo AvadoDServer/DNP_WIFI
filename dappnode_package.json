@@ -7,8 +7,8 @@
   "type": "dncore",
   "image": {
     "path": "wifi.dnp.dappnode.eth_10.0.1.tar.xz",
-    "hash": "/ipfs/QmZKXXP5FqjbucoGgubw4mCvhKcU8m7N3ErCY74ypcZaFp",
-    "size": 46623936,
+    "hash": "/ipfs/QmSBDGQ5VxB1bbZfRx9zyNFRsKAaGdNV5VjgggJfT4vUeM",
+    "size": 46661860,
     "restart": "always",
     "privileged": true,
     "subnet": "172.33.0.0/16",
@@ -27,5 +27,5 @@
   },
   "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
   "license": "GPL-3.0",
-  "builddate": "2021-12-19T15:58:25.570Z"
+  "builddate": "2021-12-19T16:03:34.934Z"
 }

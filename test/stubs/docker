@@ -1,0 +1,43 @@
+#!/bin/sh
+# Fake docker CLI for test/run-tests.sh. Simulates the host's wifi card with a
+# dummy interface; state lives in /tmp/sim.
+S=/tmp/sim
+case "$1" in
+  inspect)
+    case "$*" in
+      *State.Pid*) echo 4242 ;;
+      *Config.Image*) echo wifi-test-image ;;
+    esac
+    exit 0 ;;
+  run) ;;
+  *) exit 1 ;;
+esac
+for last; do :; done   # last argument = the shell command
+echo "$last" >> $S/docker-run.log
+present() { [ -f $S/present ] && [ ! -f $S/claimed ]; }
+case "$last" in
+  "iw dev")
+    present && printf 'phy#0\n\tInterface wlp1s0\n\t\ttype managed\n' ;;
+  *"/phy80211 && echo"*)
+    present && echo wlp1s0 ;;
+  *operstate*)
+    present && cat $S/opstate 2>/dev/null || echo down ;;
+  *"phy80211/name"*)
+    present && echo phy0 ;;
+  "iw phy phy0 set netns 1")
+    [ -f $S/handback_fails ] && exit 1
+    ip link del wlan0 2>/dev/null
+    rm -f $S/claimed
+    echo handed-back >> $S/events ;;
+  "iw phy phy0 set netns "*)
+    if [ -f $S/veth ]; then
+      # veth pair: the other end (cli0) plays a wifi client for DHCP tests
+      ip link add wlp1s0 type veth peer name cli0
+      ip link set cli0 up
+    else
+      ip link add wlp1s0 type dummy
+    fi
+    touch $S/claimed
+    echo claimed >> $S/events ;;
+esac
+exit 0

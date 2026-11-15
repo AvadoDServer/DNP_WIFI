@@ -1,0 +1,9 @@
+#!/bin/sh
+# Fake hostapd: runs until TERM, or exits 3 when /tmp/sim/hostapd_die exists.
+trap 'echo hostapd-term >> /tmp/sim/events; exit 0' TERM
+[ -f /tmp/sim/apstate ] || echo ENABLED > /tmp/sim/apstate
+echo "hostapd started with $1" >> /tmp/sim/events
+while true; do
+  [ -f /tmp/sim/hostapd_die ] && { rm -f /tmp/sim/hostapd_die; exit 3; }
+  sleep 1
+done

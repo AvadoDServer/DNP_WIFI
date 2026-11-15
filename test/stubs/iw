@@ -1,0 +1,9 @@
+#!/bin/sh
+# Fake "iw dev wlan0 info" (the dummy test interface has no wiphy); anything
+# else goes to the real iw.
+if [ "$1 $2 $3" = "dev wlan0 info" ]; then
+  ip link show wlan0 >/dev/null 2>&1 || exit 237
+  if [ -f /tmp/sim/not_ap ]; then echo "	type managed"; else echo "	type AP"; fi
+  exit 0
+fi
+exec /usr/sbin/iw "$@"

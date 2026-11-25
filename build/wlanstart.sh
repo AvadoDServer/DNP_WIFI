@@ -166,7 +166,6 @@ wpa_key_mgmt=WPA-PSK
 # TKIP is not secure anymore
 wpa_pairwise=CCMP
 rsn_pairwise=CCMP
-wpa_ptk_rekey=600
 wmm_enabled=1
 EOF
 }

@@ -48,6 +48,8 @@ check "dnsmasq running" "wait_for 5 'docker exec $C pgrep dnsmasq >/dev/null'"
 check "NAT rule (legacy)" "docker exec $C iptables-legacy -t nat -S POSTROUTING | grep -q '172.33.12.0/24.*MASQUERADE'"
 check "hostapd.conf has ssid + ctrl_interface" "docker exec $C grep -q '^ssid=AVADO' /etc/hostapd.conf && docker exec $C grep -q '^ctrl_interface=' /etc/hostapd.conf"
 check "default password kept" "docker exec $C grep -q '^wpa_passphrase=avado123' /etc/hostapd.conf"
+check "no PTK rekey (drivers like iwlwifi cannot rekey safely)" "! docker exec $C grep -q '^wpa_ptk_rekey' /etc/hostapd.conf"
+check "WPA2 CCMP kept" "docker exec $C grep -q '^wpa=2' /etc/hostapd.conf && docker exec $C grep -q '^rsn_pairwise=CCMP' /etc/hostapd.conf"
 check "ip_forward on" "[ \"\$(docker exec $C cat /proc/sys/net/ipv4/ip_forward)\" = 1 ]"
 sleep 6
 check "watchdog quiet on a healthy AP" "! logs | grep -q Warning"

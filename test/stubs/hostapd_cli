@@ -1,0 +1,3 @@
+#!/bin/sh
+[ -f /tmp/sim/cli_hang ] && exec sleep 100
+echo "state=$(cat /tmp/sim/apstate)"

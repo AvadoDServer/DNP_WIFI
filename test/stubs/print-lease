@@ -1,0 +1,5 @@
+#!/bin/sh
+# udhcpc script: print what the server offered (udhcpc sets ip/router/dns)
+# shellcheck disable=SC2154
+[ "$1" = bound ] && echo "ip=$ip router=$router dns=$dns"
+exit 0

@@ -16,6 +16,10 @@
 #   AP gets disabled (driver/firmware reset) or hostapd stops answering, the
 #   container exits and Docker starts it again (restart: always), which sets
 #   the card up from scratch.
+# - If that keeps happening (for example a card whose firmware crashes every
+#   time the access point starts), each new try waits longer: the first
+#   restart is immediate, then 30 s, 1, 2, 4, 8 and at most 10 minutes. The
+#   count starts over after 10 minutes of a working access point or a reboot.
 
 # Default values
 true ${SUBNET:=172.33.12.0}
@@ -36,11 +40,21 @@ true ${CHECK_INTERVAL:=10}
 true ${MAX_FAILED_CHECKS:=3}
 true ${START_GRACE:=60}
 
+# Restart backoff (seconds): wait before the 2nd try in a row, doubling up to
+# the maximum, and how long the AP must work before the count starts over.
+true ${BACKOFF_BASE:=30}
+true ${BACKOFF_MAX:=600}
+true ${STABLE_AFTER:=600}
+
 WLAN=wlan0
 HOSTAPD_CONF=/etc/hostapd.conf
 HOSTAPD_CTRL=/var/run/hostapd
 DNSMASQ_CONF=/etc/dnsmasq-wifi.conf
 DNSMASQ_LEASES=/var/lib/misc/dnsmasq.leases
+# Failed runs in a row. Lives in the container's own filesystem: it survives
+# Docker's restarts, and an update or a settings change starts from zero.
+FAILURES_FILE=/var/lib/avado-wifi/failures
+BOOT_ID=$(cat /proc/sys/kernel/random/boot_id 2>/dev/null)
 
 PHY=""
 HOSTAPD_PID=""
@@ -249,6 +263,7 @@ release() {
     if ! on_container_with_host_pid "iw phy ${PHY} set netns 1"; then
       log "Could not hand ${PHY} back; the kernel returns it when this container is gone."
     fi
+    PHY=""
   fi
 }
 
@@ -260,17 +275,53 @@ on_stop() {
 }
 trap on_stop TERM INT
 
-# Restart the whole container (Docker's restart policy brings it back).
+# Failed runs in a row during this boot (0 after a reboot).
+failures_so_far() {
+  local boot="" count=""
+  [ -f "$FAILURES_FILE" ] && read -r boot count < "$FAILURES_FILE"
+  if [ -n "$BOOT_ID" ] && [ "$boot" = "$BOOT_ID" ] && [[ "$count" =~ ^[0-9]+$ ]]; then
+    echo "$count"
+  else
+    echo 0
+  fi
+}
+
+# Seconds to wait before the next try after <n> failed runs in a row.
+backoff_delay() {
+  local n=$1 delay=$BACKOFF_BASE
+  if [ "$n" -le 1 ]; then echo 0; return; fi
+  while [ "$n" -gt 2 ] && [ "$delay" -lt "$BACKOFF_MAX" ]; do
+    delay=$((delay * 2)); n=$((n - 1))
+  done
+  [ "$delay" -gt "$BACKOFF_MAX" ] && delay=$BACKOFF_MAX
+  echo "$delay"
+}
+
+# Restart the whole container (Docker's restart policy brings it back). The
+# card goes back to the host first; if this keeps failing, wait longer before
+# each new try so a crashing card is not reset over and over.
 restart_container() {
+  local failures delay
   log "[Error] $1. Restarting the access point."
   release
-  pause 5
+  failures=$(( $(failures_so_far) + 1 ))
+  mkdir -p "$(dirname "$FAILURES_FILE")"
+  echo "$BOOT_ID $failures" > "$FAILURES_FILE"
+  delay=$(backoff_delay "$failures")
+  if [ "$delay" -gt 0 ]; then
+    log "Failed ${failures} times in a row: waiting ${delay} s before the next try, so the wifi card can recover."
+  fi
+  [ "$delay" -lt 5 ] && delay=5
+  pause "$delay"
   exit 1
 }
 
 ##########
 #  MAIN  #
 ##########
+
+# A count from an earlier boot does not apply any more.
+[ "$(failures_so_far)" -eq 0 ] && rm -f "$FAILURES_FILE"
 
 claim_interface
 write_hostapd_conf
@@ -315,6 +366,10 @@ while true; do
   if [ -z "$PROBLEM" ]; then
     [ "$FAILED" -gt 0 ] && log "Access point is enabled again."
     FAILED=0
+    if [ -f "$FAILURES_FILE" ] && [ $(( $(date +%s) - STARTED_AT )) -ge "$STABLE_AFTER" ]; then
+      rm -f "$FAILURES_FILE"
+      log "Access point has worked for ${STABLE_AFTER} s: earlier failures forgotten, the next restart is immediate."
+    fi
     continue
   fi
 

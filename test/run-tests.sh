@@ -1,8 +1,9 @@
 #!/bin/bash
 # Runs build/wlanstart.sh in the real image with a fake docker CLI and a fake
 # hostapd (test/stubs), using a dummy interface as the wifi card. Checks that
-# the hotspot waits for a late card, hands the card back on stop, and restarts
-# when hostapd dies or the AP stops being enabled.
+# the hotspot waits for a late card, hands the card back on stop, restarts
+# when hostapd dies or the AP stops being enabled, and waits longer between
+# restarts when it keeps failing.
 #
 # Usage: test/run-tests.sh   (needs Docker; builds the image first)
 set -u
@@ -38,6 +39,8 @@ wait_for() {
   return 1
 }
 events() { cat "$WORK/sim/events" 2>/dev/null; }
+# log lines from the moment the failure count was reset
+after_reset() { logs | sed -n '/earlier failures forgotten/,$p'; }
 state() { docker inspect -f '{{.State.Status}} {{.State.ExitCode}} {{.RestartCount}}' $C 2>/dev/null; }
 
 echo "1. card present: starts the AP"
@@ -133,6 +136,37 @@ LEASE=$(docker exec $C udhcpc -i cli0 -n -q -t 5 -s /bin/true 2>&1)
 check "lease in 172.33.12.100-253" "echo \"\$LEASE\" | grep -Eq 'lease of 172\.33\.12\.(1[0-9][0-9]|2[0-4][0-9]|25[0-3]) obtained'"
 check "router + DNS offered" "docker exec $C udhcpc -i cli0 -n -q -t 5 -s /stubs/print-lease 2>/dev/null | grep -q 'router=172.33.12.254 dns=172.33.1.2'"
 check "lease recorded" "docker exec $C cat /var/lib/misc/dnsmasq.leases | grep -q 172.33.12."
+
+echo "11. keeps failing: waits longer each time, up to the maximum"
+start "touch /tmp/sim/present /tmp/sim/hostapd_always_die" --restart always -e BACKOFF_BASE=2 -e BACKOFF_MAX=4
+check "4 failures in a row" "wait_for 90 'logs | grep -q \"Failed 4 times in a row\"'"
+check "1st restart is immediate" "! logs | grep -q 'Failed 1 times'"
+check "2nd waits 2 s" "logs | grep -q 'Failed 2 times in a row: waiting 2 s'"
+check "3rd waits 4 s" "logs | grep -q 'Failed 3 times in a row: waiting 4 s'"
+check "4th stays at the 4 s maximum" "logs | grep -q 'Failed 4 times in a row: waiting 4 s'"
+check "card handed back every time" "[ \$(events | grep -c handed-back) -ge 4 ]"
+
+echo "12. docker stop during the wait: fast, exit 0"
+start "touch /tmp/sim/present /tmp/sim/hostapd_always_die" --restart always -e BACKOFF_BASE=120
+check "waiting 120 s" "wait_for 40 'logs | grep -q \"waiting 120 s\"'"
+T0=$(date +%s); docker stop -t 60 $C >/dev/null; T1=$(date +%s)
+check "stopped in <= 5 s (took $((T1 - T0)) s)" "[ $((T1 - T0)) -le 5 ]"
+check "exit code 0" "[ \"\$(state | cut -d' ' -f2)\" = 0 ]"
+
+echo "13. works again for a while: count starts over"
+# trigger files made on the host side: a file the container created is not
+# reliably removable from the host through the bind mount (Docker Desktop)
+start "touch /tmp/sim/present" --restart always -e BACKOFF_BASE=2 -e STABLE_AFTER=4
+touch "$WORK/sim/hostapd_die" "$WORK/sim/hostapd_always_die"
+wait_for 40 'logs | grep -q "Failed 2 times in a row"'
+rm -f "$WORK/sim/hostapd_always_die"
+check "forgets the failures after a working AP" "wait_for 40 'logs | grep -q \"earlier failures forgotten\"'"
+touch "$WORK/sim/hostapd_die"
+check "next failure restarts at once" "wait_for 15 'after_reset | grep -q \"hostapd exited\"' && sleep 1 && ! after_reset | grep -q 'in a row'"
+
+echo "14. count from an earlier boot is ignored"
+start "touch /tmp/sim/present /tmp/sim/hostapd_die; mkdir -p /var/lib/avado-wifi; echo 'another-boot 6' > /var/lib/avado-wifi/failures"
+check "restarts at once" "wait_for 15 'logs | grep -q \"hostapd exited\"' && sleep 1 && ! logs | grep -q 'in a row'"
 
 docker rm -f $C >/dev/null 2>&1
 rm -rf "$WORK"
